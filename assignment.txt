@@ -1,0 +1,22 @@
+Dear Candidate,
+You have been shortlisted for this entry level position with Team JS Tigers.
+
+To be considered for the next round, you need to develop and share deployed link of the following web app:
+
+Required features of web app to be developed using MERN Stack (MongoDB, ExpressJS, React, Node.js) or MongoDB & Next.js:
+
+1. Create Vendor: Vendor Name*, Bank Account No*., Bank Name*, Address Line 1, Address Line 2, City, Country, Zip Code.
+2. Display paginated list of vendors: Vendor Name, Bank Account No., Bank Name, Edit (link) / Delete (link)
+3. Edit: Load vendor details on edit vendor screen. Update on submit.
+4. Delete: Delete vendor after confirmation.
+*Mandatory fields.
+
+Submission Deadline: Oct 05, 2023
+
+Please let us know if you have any questions/concerns.
+
+Cheers!
+-Rakesh
+For Team JS Tigers
+
+PS: Kindly note this assignment is only a method to get a good grasp on your skills. It is neither a client project nor we intend to use your codebase in a product without your permission.
