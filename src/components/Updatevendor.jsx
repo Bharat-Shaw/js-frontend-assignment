@@ -1,24 +1,23 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { BASE_URL } from './Vendorlist'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { ThreeCircles } from 'react-loader-spinner';
+import { MyContext } from './context/ContextApi';
 
 function Updatevendor() {
-    const dispatch = useDispatch();
+    const { isloading, setIsloading } = useContext(MyContext);
     const navigate = useNavigate();
-    const isLoading = useSelector(state => state.isloading);
     const { _id } = useParams()
 
     const [formData, setFormData] = useState({})
 
     useEffect(() => {
-        dispatch({ type: 'DATALOADING' })
+        setIsloading(true)
         axios.get(`${BASE_URL}/vendor/${_id}`)
             .then((res) => {
                 setFormData(res.data)
-                dispatch({ type: 'DATALOADED' })
+                setIsloading(false)
             })
     }, [])
 
@@ -29,14 +28,13 @@ function Updatevendor() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispatch({ type: 'DATALOADING' })
+        setIsloading(true)
         axios.put(`${BASE_URL}/vendor/update/${_id}`, formData)
             .then(() => {
-                dispatch({ type: 'NOERROR' })
-                dispatch({ type: 'DATALOADED' })
+                setIsloading(false)
                 navigate('/');
             }).catch((err) => {
-                dispatch({ type: 'FETCHERROR' })
+                setIsloading(false)
             })
     }
 
@@ -52,11 +50,11 @@ function Updatevendor() {
                 <input type="text" name='city' value={formData.city} placeholder='City' onChange={handleChange} />
                 <input type="text" name='country' value={formData.country} placeholder='Country' onChange={handleChange} />
                 <input type="number" name='zip_code' value={formData.zip_code} placeholder='Zip Code' onChange={handleChange} />
-                <button type="submit" disabled={isLoading} className='bg-slate-800 text-white font-semibold flex items-center justify-center py-2 gap-6 rounded-full'>
+                <button type="submit" disabled={isloading} className='bg-slate-800 text-white font-semibold flex items-center justify-center py-2 gap-6 rounded-full'>
                     <span className='w-[60%] text-right'>Update</span>
                     <div className='w-[40%]'>
                         {
-                            isLoading && <ThreeCircles
+                            isloading && <ThreeCircles
                                 height="20"
                                 width="20"
                                 color="#4fa94d"

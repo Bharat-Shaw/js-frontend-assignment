@@ -1,22 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
 import { ThreeCircles } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
+import { MyContext } from './context/ContextApi';
 
 export const BASE_URL = "https://eager-dragonfly.cyclic.cloud";
 
 function Vendorlist() {
-    const dispatch = useDispatch();
+    const { vendorList, setVendorList, totalpage, setTotalpage, isloading, setIsloading } = useContext(MyContext);
     const navigate = useNavigate();
-    const [vendorname, setvendorname] = useState();
+    const [vendorname, setvendorname] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const vendorArr = useSelector(state => state.vendorList);
-    const isLoading = useSelector(state => state.isloading);
-    const totalpage = useSelector(state => state.totalpage);
-    const error = useSelector(state => state.isError);
-    
 
     let pagearr = [];
     for (let i = 0; i < totalpage; i++) {
@@ -24,22 +19,25 @@ function Vendorlist() {
     }
 
     const fetchData = () => {
-        dispatch({ type: 'DATALOADING' })
+        setIsloading(true)
         axios.get(`${BASE_URL}/vendor?page=${currentPage}&limit=5`)
             .then((res) => {
-                dispatch({ type: 'TOTALPAGE', payload: res.data.paginationInfo.totalPages })
-                dispatch({ type: 'ARRAY_LIST', payload: res.data.vendorlist })
-                dispatch({ type: 'DATALOADED' })
+                setTotalpage(res.data.paginationInfo.totalPages)
+                setVendorList(res.data.vendorlist)
+                setIsloading(false)
             })
     }
 
     const handleDelete = (_id) => {
-        dispatch({ type: 'DATALOADING' })
+        setIsloading(true)
         axios.delete(`${BASE_URL}/vendor/delete/${_id}`)
             .then(() => {
                 fetchData()
+                setIsloading(false)
+                setvendorname(null)
             }).catch(() => {
-                dispatch({ type: 'DATALOADED' })
+                setIsloading(false)
+                setvendorname(null)
             })
     }
 
@@ -47,7 +45,7 @@ function Vendorlist() {
         fetchData()
     }, [currentPage]);
 
-    if (isLoading) {
+    if (isloading) {
         return <div className='w-full h-[70vh] flex justify-center items-center'>
             <ThreeCircles
                 height="100"
@@ -79,7 +77,7 @@ function Vendorlist() {
                 </thead>
                 <tbody>
                     {
-                        vendorArr?.map((item, i) => {
+                        vendorList?.map((item, i) => {
                             return <tr key={i}>
                                 <td>{item.vendor_name}</td>
                                 <td>{item.bank_account}</td>
@@ -92,7 +90,7 @@ function Vendorlist() {
                                             <path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                                         </svg>
                                         <svg onClick={() => {
-                                            // handleDelete(item._id);
+                                            // handleDelete(item._id)
                                             setvendorname(item)
                                             setShowModal(true)
                                         }} fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 cursor-pointer text-red-600">
@@ -121,14 +119,14 @@ function Vendorlist() {
                         </button>
                     })
                 }
-                <button disabled={pagearr.length <= 1}
-                    className={`font-semibold ${pagearr.length <= 1 ? 'cursor-not-allowed text-slate-500' : ''}`}
+                <button disabled={pagearr.length < 1 || pagearr.length == currentPage}
+                    className={`font-semibold ${pagearr.length < 1 || pagearr.length == currentPage ? 'cursor-not-allowed text-slate-500' : ''}`}
                     onClick={() => { setCurrentPage((prev) => prev + 1) }}>Next</button>
             </div>
 
             {/* dialogue box  */}
             <div>
-                {showModal ? (
+                {showModal && vendorname._id ? (
                     <>
                         <div
                             className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
@@ -153,7 +151,9 @@ function Vendorlist() {
                                             type="button"
                                             onClick={() => {
                                                 setShowModal(false)
-                                                handleDelete(vendorname._id)
+                                                if (vendorname._id) {
+                                                    handleDelete(vendorname._id);
+                                                }
                                             }}
                                         >
                                             Confirm

@@ -3,13 +3,12 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import { BrowserRouter } from 'react-router-dom'
-import { Provider } from 'react-redux'
-import { store } from './components/redux/store.js'
+import MyProvider from './components/context/ContextApi.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <BrowserRouter>
-      <Provider store={store}>
+  <BrowserRouter>
+      <MyProvider>
         <App />
-      </Provider>
-    </BrowserRouter>
+      </MyProvider>
+  </BrowserRouter>
 )

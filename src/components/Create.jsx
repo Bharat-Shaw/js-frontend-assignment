@@ -1,14 +1,13 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { BASE_URL } from './Vendorlist'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { ThreeCircles } from 'react-loader-spinner';
+import { MyContext } from './context/ContextApi';
 
 function Create() {
-    const dispatch = useDispatch();
+    const { isloading, setIsloading } = useContext(MyContext);
     const navigate = useNavigate();
-    const isLoading = useSelector(state => state.isloading);
 
     const [formData, setFormData] = useState({
         vendor_name: '',
@@ -27,14 +26,13 @@ function Create() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispatch({ type: 'DATALOADING' })
+        setIsloading(true)
         axios.post(`${BASE_URL}/vendor/create`, formData)
             .then(() => {
-                dispatch({ type: 'NOERROR' })
-                dispatch({ type: 'DATALOADED' })
+                setIsloading(false)
                 navigate('/');
             }).catch((err) => {
-                dispatch({ type: 'FETCHERROR' })
+                setIsloading(false)
             })
     }
 
@@ -50,11 +48,11 @@ function Create() {
                 <input type="text" name='city' placeholder='City' onChange={handleChange} />
                 <input type="text" name='country' placeholder='Country' onChange={handleChange} />
                 <input type="number" name='zip_code' placeholder='Zip Code' onChange={handleChange} />
-                <button type="submit" disabled={isLoading} className='bg-sky-500 flex items-center justify-center py-2 gap-6 rounded-full'>
+                <button type="submit" disabled={isloading} className='bg-sky-500 flex items-center justify-center py-2 gap-6 rounded-full'>
                     <span className='w-[55%] text-right font-semibold'>Create</span>
                     <div className='w-[45%]'>
                         {
-                            isLoading && <ThreeCircles
+                            isloading && <ThreeCircles
                             height="20"
                             width="20"
                             color="#4fa94d"
